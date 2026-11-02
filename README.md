@@ -8,7 +8,7 @@ réchauffement prolongé jusqu'en 2035 (+27 %), mais l'intervalle bootstrap de
 ce chargement va d'environ −55 % à +150 %, et le modèle stationnaire passe le
 backtest 2013-2024.
 
-- 📄 Rapport : `rapport/` (Quarto, publié sur GitHub Pages)
+- 📄 Rapport : https://selyassine.github.io/climatXL/
 - 📊 Application en ligne : https://climatxl.shinyapps.io/climatXL/
 
 Ce package teste si la loi des sinistres extrêmes change avec le temps et le

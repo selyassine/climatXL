@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Le climat rend-il la réassurance catastrophe plus chère ?",
+    "section": "",
+    "text": "NoteEn une phrase\n\n\n\nSur 1996-2024, la prime pure de la tranche 5 Md$ au-delà de 10 Md$ passerait de 2 176 M$ à 2 762 M$ sous un réchauffement prolongé jusqu’en 2035 (+27 %), mais l’intervalle bootstrap de ce chargement va de −59 % à +142 %. Les données ne justifient pas de chargement climatique démontrable, et le modèle stationnaire passe le backtest 2013-2024."
+  },
+  {
+    "objectID": "index.html#validation-sur-les-données-danoises",
+    "href": "index.html#validation-sur-les-données-danoises",
+    "title": "Le climat rend-il la réassurance catastrophe plus chère ?",
+    "section": "3.1 Validation sur les données danoises",
+    "text": "3.1 Validation sur les données danoises\nLe code reproduit McNeil (1997) : au seuil de 10 M DKK, ξ = 0,497 et β = 6,97, et le quantile à 99,9 % vaut 94 contre 95 publié. Ces valeurs sont vérifiées par les tests du package, ainsi que la concordance avec evd et fExtremes."
+  },
+  {
+    "objectID": "index.html#modèle-stationnaire",
+    "href": "index.html#modèle-stationnaire",
+    "title": "Le climat rend-il la réassurance catastrophe plus chère ?",
+    "section": "3.2 Modèle stationnaire",
+    "text": "3.2 Modèle stationnaire\n\n\n\n\n\n\n\n\nFigure 1: Choix du seuil : excès moyens et stabilité de ξ (Md$ 2024).\n\n\n\n\n\nAu seuil de 1 Md$ (116 sinistres, environ 4 par an), la GPD donne ξ = 0,93 (0,18) et β = 1,53 Md$. La queue est extrêmement lourde : avec ξ proche de 1, l’espérance d’un sinistre est à peine finie. Une tranche, bornée, garde toutefois une prime finie.\n\n\n\n\nTable 1: Niveaux de retour, modèle stationnaire (Md$ 2024), IC 95 % par vraisemblance profilée.\n\n\n\n\n\n\nPériode (ans)\nNiveau\nIC 95 %\n\n\n\n\n10\n50\n[26 ; 144]\n\n\n50\n229\n[75 ; 1 255]\n\n\n100\n437\n[118 ; 3 197]\n\n\n200\n834\n[183 ; 8 148]"
+  },
+  {
+    "objectID": "index.html#modèle-non-stationnaire",
+    "href": "index.html#modèle-non-stationnaire",
+    "title": "Le climat rend-il la réassurance catastrophe plus chère ?",
+    "section": "3.3 Modèle non stationnaire",
+    "text": "3.3 Modèle non stationnaire\nL’échelle de la GPD dépend d’une covariable, log β = γ₀ + γ₁ z, à ξ constant. La fréquence suit un processus de Poisson dont le taux annuel est log-linéaire. Chaque modèle est comparé au modèle stationnaire par le rapport de vraisemblance et l’AIC.\n\n\n\n\nTable 2: Tests de non-stationnarité.\n\n\n\n\n\n\nEffet\nStatistique LR\np\nΔAIC\n\n\n\n\nGravité ~ année (par décennie)\n2,95\n0,086\n-1,0\n\n\nGravité ~ température\n1,93\n0,165\n0,1\n\n\nGravité ~ ENSO\n0,01\n0,914\n2,0\n\n\nFréquence ~ année (par décennie)\n3,65\n0,056\n-1,7\n\n\nFréquence ~ température\n1,53\n0,217\n0,5\n\n\n\n\n\n\n\n\nAucun effet n’est significatif à 5 %. Les estimations ponctuelles vont en sens opposé : des sinistres un peu plus graves, mais un peu moins fréquents. L’année et la température sont corrélées à 0,91 : ces données ne peuvent pas distinguer un effet climatique d’une tendance temporelle quelconque."
+  }
+]

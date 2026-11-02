@@ -1,5 +1,5 @@
 # Pipeline climatXL : `targets::tar_make()` refait toute l'analyse.
-# Semaines 1 à 3 branchées ; les semaines 4 et 5 sont notées en commentaire.
+# Semaines 1 à 4 branchées ; la semaine 5 est notée en commentaire.
 
 library(targets)
 tar_option_set(packages = "climatXL")
@@ -43,11 +43,22 @@ list(
   tar_target(n_obs_years, max(years) - first_year + 1),
   tar_target(stability, threshold_stability(cat_x, exp(seq(log(0.2), log(6), length = 25)))),
   tar_target(fit_stat, gpd_fit(cat_x, threshold = 1, n_years = n_obs_years)),
-  tar_target(rl_stat, return_level(fit_stat, c(10, 50, 100, 200), ci = TRUE))
-
-  # --- Semaine 4 : modèle non stationnaire ---------------------------------
-  # tar_target(fit_ns, fit_nonstationary(losses_norm, covariates = c("year", "temp_anom"))),
-  # tar_target(lr_test, compare_models(fit_stat, fit_ns)),
+  tar_target(rl_stat, return_level(fit_stat, c(10, 50, 100, 200), ci = TRUE)),
+  # --- Semaine 4 : modele non stationnaire -----------------------------------
+  tar_target(cat_data, transform(merge(transform(cat_events, loss = loss / 1e9),
+                                       covariates, by = "year"),
+                                 t = (year - 2010) / 10)),
+  tar_target(counts, transform(merge(exceedance_counts(cat_data, 1, first_year:max(years)),
+                                     covariates, by = "year"), t = (year - 2010) / 10)),
+  tar_target(ns_m0, gpd_fit_ns(cat_data, 1, ~ 1)),
+  tar_target(ns_year, gpd_fit_ns(cat_data, 1, ~ t)),
+  tar_target(ns_temp, gpd_fit_ns(cat_data, 1, ~ temp_anom)),
+  tar_target(ns_enso, gpd_fit_ns(cat_data, 1, ~ enso_jjason)),
+  tar_target(severity_tests, rbind(year = lr_test(ns_m0, ns_year),
+                                   temp = lr_test(ns_m0, ns_temp),
+                                   enso = lr_test(ns_m0, ns_enso))),
+  tar_target(freq_year, poisson_trend(counts, n ~ t)),
+  tar_target(freq_temp, poisson_trend(counts, n ~ temp_anom))
 
   # --- Semaine 5 : tarification --------------------------------------------
   # tar_target(premium, price_layer(fit_ns, attachment = 1e9, limit = 5e8, scenario = "2035")),

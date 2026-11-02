@@ -14,7 +14,7 @@ seulement être démontrée.
 | 1 | Package, CI, reproduction de McNeil (1997) | fait |
 | 2 | Données NOAA, normalisation des pertes | fait |
 | 3 | Modèle stationnaire | fait |
-| 4 | Modèle non stationnaire et tests | à faire |
+| 4 | Modèle non stationnaire et tests | fait |
 | 5 | Tarification, scénarios, bootstrap, backtest | à faire |
 | 6 | Rapport Quarto, application Shiny | à faire |
 
@@ -84,6 +84,29 @@ targets::tar_read(losses_norm) # un sinistre par épisode, en dollars de 2024
 | 200 ans | 834 | [183 ; 8 147] |
 
 Katrina (164 Md$) a une période de retour estimée d'environ 35 ans.
+
+## Modèle non stationnaire (semaine 4)
+
+Sévérité : log β dépend d'une covariable, ξ constant. Fréquence : Poisson
+log-linéaire du nombre annuel de sinistres > 1 Md$.
+
+| Effet testé | Coefficient (e.t.) | Rapport de vraisemblance, p |
+| --- | --- | --- |
+| Sévérité ~ année (par décennie) | +0,32 (0,18) | 0,09 |
+| Sévérité ~ anomalie de température (par °C) | +1,01 (0,72) | 0,16 |
+| Sévérité ~ ENSO (juin-novembre) | −0,02 (0,20) | 0,91 |
+| Fréquence ~ année (par décennie) | −0,21 (0,11) | 0,06 |
+| Fréquence ~ température | −0,52 (0,43) | 0,22 |
+
+**Aucun effet n'est significatif à 5 %.** Les estimations ponctuelles vont
+dans des sens opposés : sinistres un peu plus graves, un peu moins
+fréquents. L'année et la température sont corrélées à 0,91 : les données ne
+permettent pas de séparer une tendance temporelle d'un effet climatique.
+
+Le sinistre centennal du climat de 1996 (330 Md$) reviendrait, avec le
+climat de 2024, tous les **59 ans** (estimation ponctuelle), mais
+l'intervalle à 95 % va de **9 à 316 ans** et contient 100 ans : on ne peut
+pas conclure à un changement.
 
 ## Pipeline
 

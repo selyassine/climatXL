@@ -4,7 +4,9 @@
 # Les paramètres viennent de `parametres.rds` (voir climatXL::model_parameters).
 
 library(shiny)
-library(climatXL)
+# Les fonctions du package sont copiees dans app/R/ (chargees automatiquement
+# par Shiny) : l'application se deploie sans installer climatXL depuis GitHub.
+# Elles sont recopiees par la cible `app_code` de _targets.R.
 
 mp <- readRDS("parametres.rds")
 u <- mp$threshold
@@ -102,8 +104,10 @@ server <- function(input, output, session) {
     ps <- scenario_parameters(mp$point); pc <- point(); L <- layer()
     zs <- return_level_at(per, ps[["xi"]], ps[["beta"]], ps[["lambda"]], u)
     zc <- return_level_at(per, pc[["xi"]], pc[["beta"]], pc[["lambda"]], u)
+    # Sous un taux plus faible, les periodes courtes n'ont pas de niveau de retour.
+    zc[pc[["lambda"]] * per <= 1] <- NA
     par(mar = c(4.2, 4.5, 2.5, 1))
-    plot(per, zs, log = "xy", type = "l", lwd = 2, col = "#1f5fa8", ylim = range(c(zs, zc, L[1] + L[2])),
+    plot(per, zs, log = "xy", type = "l", lwd = 2, col = "#1f5fa8", ylim = range(c(zs, zc, L[1] + L[2]), na.rm = TRUE),
          xlab = "Période de retour (années)", ylab = "Sinistre (Md$ 2024)", main = "Niveaux de retour", yaxt = "n")
     axis(2, at = c(0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000), labels = c("0,5", 1, 2, 5, 10, 20, 50, 100, 200, 500, "1 000", "2 000"), las = 1)
     rect(1e-3, L[1], 1e4, L[1] + L[2], col = adjustcolor("#f0b429", .25), border = NA)

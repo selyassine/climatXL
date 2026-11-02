@@ -79,5 +79,12 @@ list(
     saveRDS(model_parameters(cat_data, covariates, first_year:max(years), 1, B = 300),
             "app/parametres.rds")
     "app/parametres.rds"
+  }, format = "file"),
+  tar_target(app_code, {
+    dir.create("app/R", showWarnings = FALSE)
+    src <- c("R/eda.R", "R/gpd.R", "R/nonstationary.R", "R/pricing.R", "R/app_params.R")
+    dest <- file.path("app/R", basename(src))
+    file.copy(src, dest, overwrite = TRUE)
+    dest
   }, format = "file")
 )

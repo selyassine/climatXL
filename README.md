@@ -2,6 +2,15 @@
 
 > Le climat rend-il la réassurance catastrophe plus chère ?
 
+**Réponse sur 1996-2024 : pas de façon démontrable.** La prime pure de la
+tranche 5 Md$ au-delà de 10 Md$ passerait de 2 176 M$ à 2 762 M$ sous un
+réchauffement prolongé jusqu'en 2035 (+27 %), mais l'intervalle bootstrap de
+ce chargement va d'environ −55 % à +150 %, et le modèle stationnaire passe le
+backtest 2013-2024.
+
+- 📄 Rapport : `rapport/` (Quarto, publié sur GitHub Pages)
+- 📊 Application : `app/` (Shiny, publiée sur shinyapps.io)
+
 Ce package teste si la loi des sinistres extrêmes change avec le temps et le
 climat, puis traduit la réponse en prime de traité en excédent de sinistre.
 La conclusion peut aussi être « pas de tendance significative » : elle doit
@@ -16,7 +25,7 @@ seulement être démontrée.
 | 3 | Modèle stationnaire | fait |
 | 4 | Modèle non stationnaire et tests | fait |
 | 5 | Tarification, scénarios, bootstrap, backtest | fait |
-| 6 | Rapport Quarto, application Shiny | à faire |
+| 6 | Rapport Quarto, application Shiny | fait |
 
 ## Installation
 
@@ -138,6 +147,32 @@ annuelle ni reconstitution. Scénario 2035 : tendance de la température
 **Conclusion : sur 1996-2024, les données NOAA ne justifient pas de
 chargement climatique démontrable.** L'incertitude d'estimation (±50 % à
 ±180 %) dépasse largement l'effet climatique estimé.
+
+## Structure
+
+```
+R/                 fonctions : lecture NOAA, normalisation, GPD, tarification
+tests/testthat/    tests (dont la reproduction de McNeil 1997)
+_targets.R         pipeline : données brutes -> résultats -> paramètres de l'app
+analyse/           scripts exploratoires des semaines 3 à 5
+rapport/           note actuarielle Quarto (site web)
+app/               application Shiny
+.github/workflows/ R CMD check automatique
+```
+
+## Mise en ligne
+
+```r
+targets::tar_make()                       # refait toute l'analyse
+```
+```sh
+quarto render rapport                     # construit le site du rapport
+quarto publish gh-pages rapport           # le publie sur GitHub Pages
+```
+```r
+# Application : une fois le compte shinyapps.io relié avec rsconnect::setAccountInfo()
+rsconnect::deployApp("app", appName = "climatXL")
+```
 
 ## Pipeline
 

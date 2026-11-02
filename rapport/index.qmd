@@ -1,0 +1,211 @@
+---
+title: "Le climat rend-il la réassurance catastrophe plus chère ?"
+subtitle: "Note actuarielle : théorie des valeurs extrêmes non stationnaire appliquée aux sinistres catastrophe américains, 1996-2024"
+author: "Yassine"
+date: today
+---
+
+```{r}
+#| label: setup
+library(climatXL)
+store <- "../_targets"
+tr <- function(name) targets::tar_read_raw(name, store = store)
+fmt <- function(x, d = 0) formatC(x, format = "f", digits = d, big.mark = " ", decimal.mark = ",")
+pct <- function(x) paste0(ifelse(x > 0, "+", "−"), fmt(abs(100 * x), 0), " %")
+
+cat_data <- tr("cat_data"); fit <- tr("fit_stat"); rl <- tr("rl_stat")
+tests <- tr("severity_tests"); fy <- tr("freq_year"); ft <- tr("freq_temp")
+ns_temp <- tr("ns_temp"); cov <- tr("covariates")
+p_stat <- tr("premium_stat"); p_35 <- tr("premium_2035"); boot <- tr("premium_boot")
+t35 <- tr("temp_2035"); n_years <- tr("n_obs_years")
+mp <- model_parameters(cat_data, cov, tr("first_year"):max(tr("years")), 1, B = 300)
+load_boot <- vapply(seq_len(nrow(mp$boot)), function(i) {
+  b <- mp$boot[i, ]
+  s <- scenario_parameters(b); c35 <- scenario_parameters(b, t35)
+  layer_premium(c35[["xi"]], c35[["beta"]], c35[["lambda"]], 1, 10, 5) /
+    layer_premium(s[["xi"]], s[["beta"]], s[["lambda"]], 1, 10, 5) - 1
+}, numeric(1))
+q_load <- quantile(load_boot, c(.025, .975), na.rm = TRUE)
+```
+
+::: {.callout-note}
+## En une phrase
+
+Sur 1996-2024, la prime pure de la tranche **5 Md$ au-delà de 10 Md$**
+passerait de `r fmt(1000 * p_stat)` M$ à `r fmt(1000 * p_35)` M$ sous un
+réchauffement prolongé jusqu'en 2035 (`r pct(p_35 / p_stat - 1)`), mais
+l'intervalle bootstrap de ce chargement va de `r pct(q_load[1])` à
+`r pct(q_load[2])`. **Les données ne justifient pas de chargement climatique
+démontrable**, et le modèle stationnaire passe le backtest 2013-2024.
+:::
+
+# Question
+
+Les modèles de tarification de la réassurance catastrophe supposent que le
+passé ressemble à l'avenir. Cette note teste cette hypothèse : la loi des
+sinistres extrêmes américains a-t-elle changé avec le temps et avec la
+température globale, et si oui, de combien faut-il corriger la prime d'une
+tranche en excédent de sinistre ?
+
+# Données
+
+| Source | Usage |
+| --- | --- |
+| NOAA Storm Events (fichiers *details*, 1990-2024) | dommages matériels par événement |
+| FRED : CPI (`CPIAUCSL`) et PIB nominal (`GDPA`) | normalisation |
+| NOAA *Climate at a Glance* | anomalie de température globale |
+| NOAA PSL : indice ONI | ENSO (moyenne juin-novembre) |
+| Sinistres incendie danois (McNeil, 1997) | validation du code |
+
+**Rupture de 1996.** Avant 1996, la base NOAA ne contient que les tornades,
+le vent et la grêle : aucun ouragan n'y figure, pas même Andrew (1992).
+L'étude porte donc sur **`r n_years` années, 1996-2024**.
+
+**Du rapport au sinistre.** La NOAA découpe une tempête en épisodes, par
+bureau météo et par État. Les épisodes sont regroupés par une **clause des 72
+heures**, comme dans un traité catastrophe : Katrina passe de six épisodes à
+un sinistre unique de `r fmt(max(cat_data$loss), 0)` Md$.
+
+**Normalisation.** Un ouragan de 1996 coûterait davantage aujourd'hui, parce
+qu'il y a plus de biens, et de plus grande valeur. Les montants sont ramenés
+en dollars 2024 par le rapport des PIB nominaux, qui corrige à la fois de
+l'inflation et de la croissance de la richesse exposée (dans l'esprit de
+Pielke et al., 2008).
+
+# Méthode
+
+## Validation sur les données danoises
+
+Le code reproduit McNeil (1997) : au seuil de 10 M DKK, ξ = 0,497 et
+β = 6,97, et le quantile à 99,9 % vaut 94 contre 95 publié. Ces valeurs sont
+vérifiées par les tests du package, ainsi que la concordance avec `evd` et
+`fExtremes`.
+
+## Modèle stationnaire
+
+```{r}
+#| label: fig-seuil
+#| fig-cap: "Choix du seuil : excès moyens et stabilité de ξ (Md$ 2024)."
+x <- cat_data$loss
+par(mfrow = c(1, 2), mar = c(4.2, 4.2, 2, 1))
+me <- mean_excess(x, thresholds = exp(seq(log(0.1), log(15), length = 60)), min_exceed = 8)
+plot(me$threshold, me$mean_excess, log = "x", type = "l", lwd = 2, col = "#1f5fa8",
+     xlab = "Seuil (Md$)", ylab = "Excès moyen (Md$)", main = "Excès moyens")
+abline(v = 1, lty = 3, col = "#c0392b")
+st <- tr("stability")
+plot(st$threshold, st$xi, log = "x", pch = 19, cex = .6, ylim = c(-0.2, 1.6), col = "#1f5fa8",
+     xlab = "Seuil (Md$)", ylab = "ξ", main = "Stabilité de ξ")
+arrows(st$threshold, st$xi_lower, st$threshold, st$xi_upper, length = 0, col = "grey60")
+abline(v = 1, lty = 3, col = "#c0392b")
+```
+
+Au seuil de **1 Md$** (`r fit$n_exceed` sinistres, environ
+`r fmt(fit$n_exceed / n_years, 0)` par an), la GPD donne
+ξ = `r fmt(fit$par[["xi"]], 2)` (`r fmt(fit$se[["xi"]], 2)`) et
+β = `r fmt(fit$par[["beta"]], 2)` Md$. La queue est extrêmement lourde : avec
+ξ proche de 1, l'espérance d'un sinistre est à peine finie. Une tranche,
+bornée, garde toutefois une prime finie.
+
+```{r}
+#| label: tbl-rl
+#| tbl-cap: "Niveaux de retour, modèle stationnaire (Md$ 2024), IC 95 % par vraisemblance profilée."
+knitr::kable(data.frame(`Période (ans)` = rl$period, `Niveau` = fmt(rl$return_level),
+                        `IC 95 %` = paste0("[", fmt(rl$lower), " ; ", fmt(rl$upper), "]"),
+                        check.names = FALSE))
+```
+
+## Modèle non stationnaire
+
+L'échelle de la GPD dépend d'une covariable, log β = γ₀ + γ₁ z, à ξ constant.
+La fréquence suit un processus de Poisson dont le taux annuel est
+log-linéaire. Chaque modèle est comparé au modèle stationnaire par le
+rapport de vraisemblance et l'AIC.
+
+```{r}
+#| label: tbl-tests
+#| tbl-cap: "Tests de non-stationnarité."
+fr <- rbind(year = fy$lr, temp = ft$lr)
+knitr::kable(data.frame(
+  `Effet` = c("Gravité ~ année (par décennie)", "Gravité ~ température", "Gravité ~ ENSO",
+              "Fréquence ~ année (par décennie)", "Fréquence ~ température"),
+  `Statistique LR` = fmt(c(tests$lr, fr$lr), 2),
+  `p` = fmt(c(tests$p_value, fr$p_value), 3),
+  `ΔAIC` = fmt(c(tests$aic1 - tests$aic0, fr$aic1 - fr$aic0), 1),
+  check.names = FALSE))
+```
+
+**Aucun effet n'est significatif à 5 %.** Les estimations ponctuelles vont en
+sens opposé : des sinistres un peu plus graves, mais un peu moins fréquents.
+L'année et la température sont corrélées à
+`r fmt(cor(cov$year[cov$year >= 1996], cov$temp_anom[cov$year >= 1996]), 2)` :
+ces données ne peuvent pas distinguer un effet climatique d'une tendance
+temporelle quelconque.
+
+# Résultats : tarification
+
+Le scénario 2035 prolonge la tendance de température 1996-2024
+(anomalie de `r fmt(t35, 2)` °C). Les tranches portent sur la perte de marché
+américaine, sans limite annuelle ni reconstitution.
+
+```{r}
+#| label: fig-charg
+#| fig-cap: "Distribution bootstrap du chargement climatique 2035, tranche 5 Md$ xs 10 Md$."
+par(mar = c(4.2, 4.2, 1, 1))
+hist(pmin(100 * load_boot, 400), breaks = 40, col = "#9bb8dc", border = "white", main = NULL,
+     xlab = "Chargement climatique (%)", ylab = "Fréquence")
+abline(v = 0, lty = 2); abline(v = 100 * (p_35 / p_stat - 1), col = "#c0392b", lwd = 2)
+```
+
+- Prime pure stationnaire de la tranche 5 Md$ xs 10 Md$ :
+  **`r fmt(1000 * p_stat)` M$**, IC bootstrap
+  [`r fmt(1000 * quantile(boot, .025))` ; `r fmt(1000 * quantile(boot, .975))`] M$.
+- Scénario 2035 : **`r fmt(1000 * p_35)` M$**, soit `r pct(p_35 / p_stat - 1)`,
+  IC [`r pct(q_load[1])` ; `r pct(q_load[2])`].
+- Sur une tranche basse (0,5 Md$ xs 1 Md$, touchée presque chaque année), le
+  chargement est négatif, car la fréquence baisse : **le signe du
+  chargement dépend de la tranche.**
+
+# Validation : backtest
+
+Les modèles ajustés sur 1996-2012 ont été confrontés aux sinistres
+2013-2024. Le modèle stationnaire prévoyait 13,2 sinistres au-delà de 5 Md$
+(12 observés) et 3,1 au-delà de 20 Md$ (3 observés). Le modèle climatique
+surestimait ces extrêmes (19,9 et 6,1). Le détail est dans
+`analyse/s5b.R`.
+
+# Limites
+
+- **Dommages estimés, non assurés.** La NOAA rapporte des estimations de
+  dommages économiques, parfois arrondies et parfois manquantes. La
+  méthode d'estimation a varié au fil du temps : le nombre de gros
+  sinistres baisse après 2013, probablement pour cette raison.
+- **Normalisation nationale.** Le PIB national ne voit pas que les côtes
+  exposées se sont enrichies plus vite que le reste du pays : la gravité
+  récente pourrait être légèrement surestimée.
+- **29 ans, c'est court** pour des événements centennaux : les intervalles
+  de confiance des niveaux de retour vont de 1 à 10.
+- **Une covariable globale.** L'anomalie de température mondiale ne
+  représente pas directement la température de surface de l'Atlantique,
+  qui gouverne l'activité cyclonique.
+
+# Conclusion
+
+Sur 1996-2024, la théorie des valeurs extrêmes non stationnaire ne met en
+évidence **aucun changement significatif** de la loi des sinistres
+catastrophe américains normalisés. Le chargement climatique estimé pour 2035
+(`r pct(p_35 / p_stat - 1)` sur la tranche 5 Md$ xs 10 Md$) est noyé dans
+l'incertitude d'estimation, et le modèle stationnaire passe le backtest. Ce
+résultat ne dit pas que le climat n'a pas d'effet. Il dit que cet effet n'est
+pas mesurable avec ces données. Un tarificateur qui appliquerait un
+chargement devrait le justifier par d'autres sources (modèles physiques,
+données de température de surface de la mer), pas par l'historique des
+sinistres.
+
+# Références
+
+- McNeil, A. J. (1997). Estimating the tails of loss severity distributions
+  using extreme value theory. *ASTIN Bulletin*, 27(1), 117-137.
+- Pielke, R. A. Jr. et al. (2008). Normalized hurricane damage in the United
+  States: 1900-2005. *Natural Hazards Review*, 9(1), 29-42.
+- Coles, S. (2001). *An Introduction to Statistical Modeling of Extreme
+  Values*. Springer.

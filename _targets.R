@@ -1,5 +1,6 @@
 # Pipeline climatXL : `targets::tar_make()` refait toute l'analyse.
-# Semaines 1 à 5 branchées.
+# Toutes les étapes, des données brutes aux paramètres de l'application.
+# Le rapport se construit ensuite avec `quarto render rapport`.
 
 library(targets)
 tar_option_set(packages = "climatXL")
@@ -71,5 +72,12 @@ list(
     1, 10, 5)),
   tar_target(climate_loading, premium_2035 / premium_stat - 1),
   tar_target(premium_boot, bootstrap_premium(transform(cat_data, loss = loss),
-                                             first_year:max(years), 1, 10, 5, B = 1000))
+                                             first_year:max(years), 1, 10, 5, B = 1000)),
+
+  # --- Semaine 6 : parametres de l'application Shiny ---------------------------
+  tar_target(app_params, {
+    saveRDS(model_parameters(cat_data, covariates, first_year:max(years), 1, B = 300),
+            "app/parametres.rds")
+    "app/parametres.rds"
+  }, format = "file")
 )

@@ -1,0 +1,24 @@
+project:
+  type: website
+  output-dir: _site
+website:
+  title: "climatXL"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Note actuarielle
+    right:
+      - icon: github
+        href: https://github.com/selyassine/climatXL
+format:
+  html:
+    theme: cosmo
+    toc: true
+    number-sections: true
+    lang: fr
+    fig-width: 8
+    fig-height: 4.5
+execute:
+  echo: false
+  warning: false
+  message: false

@@ -6,3 +6,8 @@ _targets/
 climatXL.Rcheck/
 data-raw/noaa/
 analyse/sortie/
+_site/
+.quarto/
+rapport/_site/
+rapport/.quarto/
+app/rsconnect/

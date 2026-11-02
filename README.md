@@ -12,8 +12,8 @@ seulement être démontrée.
 | Semaine | Travail | État |
 | --- | --- | --- |
 | 1 | Package, CI, reproduction de McNeil (1997) | fait |
-| 2 | Données NOAA, normalisation des pertes | code fait, données à télécharger |
-| 3 | Modèle stationnaire | à faire |
+| 2 | Données NOAA, normalisation des pertes | fait |
+| 3 | Modèle stationnaire | fait |
 | 4 | Modèle non stationnaire et tests | à faire |
 | 5 | Tarification, scénarios, bootstrap, backtest | à faire |
 | 6 | Rapport Quarto, application Shiny | à faire |
@@ -63,6 +63,27 @@ targets::tar_read(losses_norm) # un sinistre par épisode, en dollars de 2024
 - Limites : dommages estimés et non assurés, collecte modifiée en 1996
   (passage de 3 à 48 types d'événements), normalisation nationale alors que
   les côtes se sont enrichies plus vite.
+
+## Modèle stationnaire (semaine 3)
+
+- **Période : 1996-2024.** Avant 1996, la NOAA ne relevait que les tornades,
+  le vent et la grêle : aucun ouragan (Andrew 1992 est absent).
+- **Sinistre = clause des 72 heures** sur les épisodes de plus de 50 M$ :
+  Katrina passe de 6 épisodes à un seul sinistre de 164 Md$ (dollars 2024).
+- **Seuil : 1 Md$** (116 dépassements, 4 par an). Au-dessus, ξ est stable
+  et le QQ-plot est aligné.
+- **GPD : ξ = 0,93 (0,18), β = 1,53 Md$.** La queue est extrêmement lourde :
+  avec ξ proche de 1, la moyenne est à peine finie. Une tranche XL, bornée,
+  garde une prime finie.
+
+| Période de retour | Niveau de retour (Md$ 2024) | IC 95 % profilé |
+| --- | --- | --- |
+| 10 ans | 50 | [26 ; 144] |
+| 50 ans | 229 | [75 ; 1 255] |
+| 100 ans | 437 | [118 ; 3 197] |
+| 200 ans | 834 | [183 ; 8 147] |
+
+Katrina (164 Md$) a une période de retour estimée d'environ 35 ans.
 
 ## Pipeline
 

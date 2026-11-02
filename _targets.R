@@ -1,5 +1,5 @@
 # Pipeline climatXL : `targets::tar_make()` refait toute l'analyse.
-# Semaines 1 et 2 branchées ; les semaines 3 à 5 sont notées en commentaire.
+# Semaines 1 à 3 branchées ; les semaines 4 et 5 sont notées en commentaire.
 
 library(targets)
 tar_option_set(packages = "climatXL")
@@ -32,10 +32,18 @@ list(
              normalisation_factors(index, base_year, "cpi"))),
   tar_target(losses_norm, normalise_losses(episodes,
              normalisation_factors(index, base_year, "wealth"))),
-  tar_target(covariates, merge(temp, enso, by = "year"))
-
-  # --- Semaine 3 : modèle stationnaire -------------------------------------
-  # tar_target(fit_stat, gpd_fit(losses_norm$loss, threshold = u_choisi)),
+  tar_target(covariates, merge(temp, enso, by = "year")),
+  # --- Semaine 3 : modele stationnaire --------------------------------------
+  # Avant 1996, la NOAA ne relevait que tornades, vent et grele (pas
+  # d'ouragans, pas d'episodes) : l'analyse commence donc en 1996.
+  tar_target(first_year, 1996),
+  tar_target(cat_events, hours_clause(losses_norm[losses_norm$year >= first_year, ],
+                                      hours = 72, min_loss = 5e7)),
+  tar_target(cat_x, cat_events$loss / 1e9),          # milliards USD 2024
+  tar_target(n_obs_years, max(years) - first_year + 1),
+  tar_target(stability, threshold_stability(cat_x, exp(seq(log(0.2), log(6), length = 25)))),
+  tar_target(fit_stat, gpd_fit(cat_x, threshold = 1, n_years = n_obs_years)),
+  tar_target(rl_stat, return_level(fit_stat, c(10, 50, 100, 200), ci = TRUE))
 
   # --- Semaine 4 : modèle non stationnaire ---------------------------------
   # tar_target(fit_ns, fit_nonstationary(losses_norm, covariates = c("year", "temp_anom"))),

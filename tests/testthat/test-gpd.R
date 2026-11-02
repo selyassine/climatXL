@@ -44,3 +44,11 @@ test_that("gpd_risk refuse les probabilités sous le seuil", {
 test_that("trop peu de dépassements déclenche une erreur", {
   expect_error(gpd_fit(danish$loss, threshold = 200), "depassements")
 })
+
+test_that("intervalle des niveaux de retour cohérent avec gpd_risk", {
+  fit <- gpd_fit(danish$loss, threshold = 10, n_years = 11)
+  rl <- return_level(fit, c(50, 100), ci = TRUE)
+  p <- 1 - 11 / (100 * fit$n)
+  expect_equal(rl$return_level[2], gpd_risk(fit, p)$var, tolerance = 1e-8)
+  expect_true(all(rl$lower < rl$return_level & rl$return_level < rl$upper))
+})

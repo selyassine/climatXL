@@ -145,12 +145,15 @@ gpd_quantile_ci <- function(fit, p, level = 0.95, upper_max = 20) {
 #'
 #' @param fit Objet renvoyé par [gpd_fit()] avec `n_years` renseigné.
 #' @param period Périodes de retour en années.
-#' @return Un `data.frame` avec `period` et `return_level`.
+#' @param ci Ajouter un intervalle par vraisemblance profilée.
+#' @param level Niveau de l'intervalle.
+#' @return Un `data.frame` avec `period` et `return_level` (et `lower`,
+#'   `upper` si `ci = TRUE`).
 #' @export
 #' @examples
 #' fit <- gpd_fit(danish$loss, threshold = 10, n_years = 11)
 #' return_level(fit, c(10, 50, 100, 200))
-return_level <- function(fit, period = c(10, 50, 100, 200)) {
+return_level <- function(fit, period = c(10, 50, 100, 200), ci = FALSE, level = 0.95) {
   stopifnot(inherits(fit, "climatxl_gpd"))
   if (is.null(fit$n_years)) stop("Renseignez `n_years` dans gpd_fit().")
   lambda <- fit$n_exceed / fit$n_years
@@ -160,5 +163,13 @@ return_level <- function(fit, period = c(10, 50, 100, 200)) {
   xi <- fit$par[["xi"]]; beta <- fit$par[["beta"]]; u <- fit$threshold
   z <- if (abs(xi) < 1e-8) u + beta * log(lambda * period)
        else u + beta / xi * ((lambda * period)^xi - 1)
-  data.frame(period = period, return_level = z)
+  out <- data.frame(period = period, return_level = z)
+  if (ci) {
+    # Le niveau de retour a m ans est le quantile p = 1 - T / (m n) par sinistre.
+    p <- 1 - fit$n_years / (period * fit$n)
+    b <- t(vapply(p, function(pp) gpd_quantile_ci(fit, pp, level)[c("lower", "upper")],
+                  numeric(2)))
+    out$lower <- b[, 1]; out$upper <- b[, 2]
+  }
+  out
 }

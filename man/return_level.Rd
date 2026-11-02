@@ -4,15 +4,20 @@
 \alias{return_level}
 \title{Niveaux de retour}
 \usage{
-return_level(fit, period = c(10, 50, 100, 200))
+return_level(fit, period = c(10, 50, 100, 200), ci = FALSE, level = 0.95)
 }
 \arguments{
 \item{fit}{Objet renvoyé par \code{\link[=gpd_fit]{gpd_fit()}} avec \code{n_years} renseigné.}
 
 \item{period}{Périodes de retour en années.}
+
+\item{ci}{Ajouter un intervalle par vraisemblance profilée.}
+
+\item{level}{Niveau de l'intervalle.}
 }
 \value{
-Un \code{data.frame} avec \code{period} et \code{return_level}.
+Un \code{data.frame} avec \code{period} et \code{return_level} (et \code{lower},
+\code{upper} si \code{ci = TRUE}).
 }
 \description{
 Montant dépassé en moyenne une fois tous les \code{period} ans :

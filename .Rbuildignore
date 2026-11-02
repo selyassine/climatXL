@@ -1,0 +1,10 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.github$
+^data-raw$
+^_targets\.R$
+^_targets$
+^README\.Rmd$
+^rapport$
+^app$
+^LICENSE\.md$

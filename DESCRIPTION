@@ -1,0 +1,27 @@
+Package: climatXL
+Title: Non-Stationary Extreme Value Pricing of Catastrophe Excess-of-Loss Reinsurance
+Version: 0.0.1
+Authors@R: 
+    person("Yassine", "", role = c("aut", "cre"),
+           email = "yassine@example.com")
+Description: Tools to test whether the distribution of extreme catastrophe
+    losses changes over time and with climate indices, and to translate the
+    answer into an excess-of-loss reinsurance premium. Provides peaks-over-
+    threshold tools (mean excess plot, Hill estimator, generalised Pareto
+    maximum likelihood fit, return levels, Value-at-Risk and expected
+    shortfall), validated against McNeil (1997) on the Danish fire losses.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Depends: 
+    R (>= 4.1)
+Imports:
+    stats
+Suggests:
+    testthat (>= 3.0.0),
+    fExtremes,
+    evd
+Config/testthat/edition: 3
+LazyData: true
+URL: https://github.com/selyassine/climatXL

@@ -5,3 +5,4 @@ _targets/
 *.tar.gz
 climatXL.Rcheck/
 data-raw/noaa/
+analyse/sortie/

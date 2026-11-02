@@ -15,7 +15,7 @@ seulement être démontrée.
 | 2 | Données NOAA, normalisation des pertes | fait |
 | 3 | Modèle stationnaire | fait |
 | 4 | Modèle non stationnaire et tests | fait |
-| 5 | Tarification, scénarios, bootstrap, backtest | à faire |
+| 5 | Tarification, scénarios, bootstrap, backtest | fait |
 | 6 | Rapport Quarto, application Shiny | à faire |
 
 ## Installation
@@ -107,6 +107,37 @@ Le sinistre centennal du climat de 1996 (330 Md$) reviendrait, avec le
 climat de 2024, tous les **59 ans** (estimation ponctuelle), mais
 l'intervalle à 95 % va de **9 à 316 ans** et contient 100 ans : on ne peut
 pas conclure à un changement.
+
+## Tarification (semaine 5)
+
+Tranches sur la **perte de marché américaine** (Md$ 2024), sans limite
+annuelle ni reconstitution. Scénario 2035 : tendance de la température
+1996-2024 (+0,24 °C par décennie), soit une anomalie de 1,32 °C.
+
+| Scénario | Prime pure 0,5 Md$ xs 1 Md$ | Prime pure 5 Md$ xs 10 Md$ |
+| --- | --- | --- |
+| Stationnaire | 1 729 M$ | 2 176 M$ |
+| Climat 2024 | 1 500 M$ (−13 %) | 2 505 M$ (+15 %) |
+| Scénario 2035 | 1 334 M$ (−23 %) | 2 762 M$ (+27 %) |
+| 2035, gravité seule | 1 847 M$ (+7 %) | 3 823 M$ (+76 %) |
+
+- La tranche **0,5 Md$ xs 1 Md$** est touchée 98 % des années : sur une
+  perte de marché, c'est une tranche « de travail », pas une tranche
+  catastrophe. **5 Md$ xs 10 Md$** (touchée 42 % des années) est la
+  tranche de référence.
+- Le chargement climatique change de signe selon la tranche : la fréquence
+  baisse (tranches basses) pendant que la gravité monte (tranches hautes).
+- **Bootstrap** (années rééchantillonnées) : prime stationnaire 5 xs 10
+  dans [1 186 ; 3 272] M$ ; chargement 2035 de **+27 % dans [−52 % ;
+  +177 %]**. Il n'est donc pas démontré.
+- **Backtest** (ajusté sur 1996-2012, testé sur 2013-2024) : le modèle
+  stationnaire prévoit bien les sinistres (13,2 attendus contre 12 observés
+  au-delà de 5 Md$ ; 3,1 contre 3 au-delà de 20 Md$). Le modèle climatique
+  surestime les extrêmes (19,9 et 6,1 attendus).
+
+**Conclusion : sur 1996-2024, les données NOAA ne justifient pas de
+chargement climatique démontrable.** L'incertitude d'estimation (±50 % à
+±180 %) dépasse largement l'effet climatique estimé.
 
 ## Pipeline
 

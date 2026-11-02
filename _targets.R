@@ -1,5 +1,5 @@
 # Pipeline climatXL : `targets::tar_make()` refait toute l'analyse.
-# Semaines 1 à 4 branchées ; la semaine 5 est notée en commentaire.
+# Semaines 1 à 5 branchées.
 
 library(targets)
 tar_option_set(packages = "climatXL")
@@ -58,8 +58,18 @@ list(
                                    temp = lr_test(ns_m0, ns_temp),
                                    enso = lr_test(ns_m0, ns_enso))),
   tar_target(freq_year, poisson_trend(counts, n ~ t)),
-  tar_target(freq_temp, poisson_trend(counts, n ~ temp_anom))
-
-  # --- Semaine 5 : tarification --------------------------------------------
-  # tar_target(premium, price_layer(fit_ns, attachment = 1e9, limit = 5e8, scenario = "2035")),
+  tar_target(freq_temp, poisson_trend(counts, n ~ temp_anom)),
+  # --- Semaine 5 : tarification ---------------------------------------------
+  # Tranches sur la perte de marche americaine, en Md$ 2024.
+  tar_target(temp_trend, lm(temp_anom ~ year, covariates[covariates$year >= first_year, ])),
+  tar_target(temp_2035, unname(predict(temp_trend, data.frame(year = 2035)))),
+  tar_target(premium_stat, layer_premium(fit_stat$par[["xi"]], fit_stat$par[["beta"]],
+                                         fit_stat$n_exceed / n_obs_years, 1, 10, 5)),
+  tar_target(premium_2035, layer_premium(
+    ns_temp$coef[["xi"]], gpd_ns_scale(ns_temp, data.frame(temp_anom = temp_2035)),
+    unname(predict(freq_temp$fit, data.frame(temp_anom = temp_2035), type = "response")),
+    1, 10, 5)),
+  tar_target(climate_loading, premium_2035 / premium_stat - 1),
+  tar_target(premium_boot, bootstrap_premium(transform(cat_data, loss = loss),
+                                             first_year:max(years), 1, 10, 5, B = 1000))
 )

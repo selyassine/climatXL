@@ -12,7 +12,7 @@ seulement être démontrée.
 | Semaine | Travail | État |
 | --- | --- | --- |
 | 1 | Package, CI, reproduction de McNeil (1997) | fait |
-| 2 | Données NOAA, normalisation des pertes | à faire |
+| 2 | Données NOAA, normalisation des pertes | code fait, données à télécharger |
 | 3 | Modèle stationnaire | à faire |
 | 4 | Modèle non stationnaire et tests | à faire |
 | 5 | Tarification, scénarios, bootstrap, backtest | à faire |
@@ -47,6 +47,22 @@ Ces chiffres sont vérifiés par `tests/testthat/test-mcneil1997.R`, et
 l'ajustement est recoupé avec `evd::fpot` et `fExtremes::gpdFit`.
 La série diffusée compte 2167 sinistres contre 2156 dans l'article, d'où
 les petits écarts.
+
+## Données NOAA (semaine 2)
+
+```r
+targets::tar_make()            # télécharge NOAA, CPI, PIB, température, ENSO
+targets::tar_read(losses_norm) # un sinistre par épisode, en dollars de 2024
+```
+
+- Un sinistre = un **épisode** NOAA (un même système météo), car un traité
+  catastrophe couvre un événement, pas chaque rapport local.
+- Deux normalisations : `cpi` (inflation seule) et `wealth` (PIB nominal,
+  donc inflation + croissance de la richesse exposée). Comparer les deux
+  montre ce qui relève de l'urbanisation plutôt que du climat.
+- Limites : dommages estimés et non assurés, collecte modifiée en 1996
+  (passage de 3 à 48 types d'événements), normalisation nationale alors que
+  les côtes se sont enrichies plus vite.
 
 ## Pipeline
 

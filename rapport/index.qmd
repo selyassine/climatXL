@@ -31,8 +31,8 @@ q_load <- quantile(load_boot, c(.025, .975), na.rm = TRUE)
 ::: {.callout-note}
 ## En une phrase
 
-Sur 1996-2024, la prime pure de la tranche **5 Md$ au-delà de 10 Md$**
-passerait de `r fmt(1000 * p_stat)` M$ à `r fmt(1000 * p_35)` M$ sous un
+Sur 1996-2024, la prime pure de la tranche **5 Md\$ au-delà de 10 Md\$**
+passerait de `r fmt(1000 * p_stat)` M\$ à `r fmt(1000 * p_35)` M\$ sous un
 réchauffement prolongé jusqu'en 2035 (`r pct(p_35 / p_stat - 1)`), mais
 l'intervalle bootstrap de ce chargement va de `r pct(q_load[1])` à
 `r pct(q_load[2])`. **Les données ne justifient pas de chargement climatique
@@ -64,7 +64,7 @@ L'étude porte donc sur **`r n_years` années, 1996-2024**.
 **Du rapport au sinistre.** La NOAA découpe une tempête en épisodes, par
 bureau météo et par État. Les épisodes sont regroupés par une **clause des 72
 heures**, comme dans un traité catastrophe : Katrina passe de six épisodes à
-un sinistre unique de `r fmt(max(cat_data$loss), 0)` Md$.
+un sinistre unique de `r fmt(max(cat_data$loss), 0)` Md\$.
 
 **Normalisation.** Un ouragan de 1996 coûterait davantage aujourd'hui, parce
 qu'il y a plus de biens, et de plus grande valeur. Les montants sont ramenés
@@ -99,10 +99,10 @@ arrows(st$threshold, st$xi_lower, st$threshold, st$xi_upper, length = 0, col = "
 abline(v = 1, lty = 3, col = "#c0392b")
 ```
 
-Au seuil de **1 Md$** (`r fit$n_exceed` sinistres, environ
+Au seuil de **1 Md\$** (`r fit$n_exceed` sinistres, environ
 `r fmt(fit$n_exceed / n_years, 0)` par an), la GPD donne
 ξ = `r fmt(fit$par[["xi"]], 2)` (`r fmt(fit$se[["xi"]], 2)`) et
-β = `r fmt(fit$par[["beta"]], 2)` Md$. La queue est extrêmement lourde : avec
+β = `r fmt(fit$par[["beta"]], 2)` Md\$. La queue est extrêmement lourde : avec
 ξ proche de 1, l'espérance d'un sinistre est à peine finie. Une tranche,
 bornée, garde toutefois une prime finie.
 
@@ -156,20 +156,20 @@ hist(pmin(100 * load_boot, 400), breaks = 40, col = "#9bb8dc", border = "white",
 abline(v = 0, lty = 2); abline(v = 100 * (p_35 / p_stat - 1), col = "#c0392b", lwd = 2)
 ```
 
-- Prime pure stationnaire de la tranche 5 Md$ xs 10 Md$ :
-  **`r fmt(1000 * p_stat)` M$**, IC bootstrap
-  [`r fmt(1000 * quantile(boot, .025))` ; `r fmt(1000 * quantile(boot, .975))`] M$.
-- Scénario 2035 : **`r fmt(1000 * p_35)` M$**, soit `r pct(p_35 / p_stat - 1)`,
+- Prime pure stationnaire de la tranche 5 Md\$ xs 10 Md\$ :
+  **`r fmt(1000 * p_stat)` M\$**, IC bootstrap
+  [`r fmt(1000 * quantile(boot, .025))` ; `r fmt(1000 * quantile(boot, .975))`] M\$.
+- Scénario 2035 : **`r fmt(1000 * p_35)` M\$**, soit `r pct(p_35 / p_stat - 1)`,
   IC [`r pct(q_load[1])` ; `r pct(q_load[2])`].
-- Sur une tranche basse (0,5 Md$ xs 1 Md$, touchée presque chaque année), le
+- Sur une tranche basse (0,5 Md\$ xs 1 Md\$, touchée presque chaque année), le
   chargement est négatif, car la fréquence baisse : **le signe du
   chargement dépend de la tranche.**
 
 # Validation : backtest
 
 Les modèles ajustés sur 1996-2012 ont été confrontés aux sinistres
-2013-2024. Le modèle stationnaire prévoyait 13,2 sinistres au-delà de 5 Md$
-(12 observés) et 3,1 au-delà de 20 Md$ (3 observés). Le modèle climatique
+2013-2024. Le modèle stationnaire prévoyait 13,2 sinistres au-delà de 5 Md\$
+(12 observés) et 3,1 au-delà de 20 Md\$ (3 observés). Le modèle climatique
 surestimait ces extrêmes (19,9 et 6,1). Le détail est dans
 `analyse/s5b.R`.
 
@@ -193,7 +193,7 @@ surestimait ces extrêmes (19,9 et 6,1). Le détail est dans
 Sur 1996-2024, la théorie des valeurs extrêmes non stationnaire ne met en
 évidence **aucun changement significatif** de la loi des sinistres
 catastrophe américains normalisés. Le chargement climatique estimé pour 2035
-(`r pct(p_35 / p_stat - 1)` sur la tranche 5 Md$ xs 10 Md$) est noyé dans
+(`r pct(p_35 / p_stat - 1)` sur la tranche 5 Md\$ xs 10 Md\$) est noyé dans
 l'incertitude d'estimation, et le modèle stationnaire passe le backtest. Ce
 résultat ne dit pas que le climat n'a pas d'effet. Il dit que cet effet n'est
 pas mesurable avec ces données. Un tarificateur qui appliquerait un

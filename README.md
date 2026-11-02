@@ -9,7 +9,7 @@ ce chargement va d'environ −55 % à +150 %, et le modèle stationnaire passe l
 backtest 2013-2024.
 
 - 📄 Rapport : `rapport/` (Quarto, publié sur GitHub Pages)
-- 📊 Application : `app/` (Shiny, publiée sur shinyapps.io)
+- 📊 Application en ligne : https://climatxl.shinyapps.io/climatXL/
 
 Ce package teste si la loi des sinistres extrêmes change avec le temps et le
 climat, puis traduit la réponse en prime de traité en excédent de sinistre.

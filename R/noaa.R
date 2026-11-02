@@ -137,21 +137,32 @@ aggregate_episodes <- function(events, crops = FALSE) {
   dmg <- ifelse(is.na(events$damage_property), 0, events$damage_property)
   if (crops) dmg <- dmg + ifelse(is.na(events$damage_crops), 0, events$damage_crops)
   key <- ifelse(is.na(events$episode_id), -events$event_id, events$episode_id)
-  sp <- split(seq_along(key), key)
-  rows <- lapply(sp, function(i) {
-    by_type <- tapply(dmg[i], events$event_type[i], sum)
-    data.frame(
-      episode_id = events$episode_id[i[1]],
-      year = min(events$year[i]),
-      date = min(events$begin_date[i]),
-      n_events = length(i),
-      n_states = length(unique(events$state[i])),
-      main_type = names(by_type)[which.max(by_type)],
-      loss = sum(dmg[i]),
-      stringsAsFactors = FALSE
-    )
-  })
-  out <- do.call(rbind, rows)
+  # Calcul vectorise (une boucle par episode prenait 30 min sur 1,8 M de lignes).
+  keys <- sort(unique(key))
+  g <- match(key, keys)
+  loss <- as.numeric(rowsum(dmg, g, reorder = TRUE))
+  n_events <- tabulate(g, length(keys))
+  ord <- order(g, events$begin_date)
+  d1 <- ord[!duplicated(g[ord])]
+  date <- events$begin_date[d1]
+  year <- as.integer(format(date, "%Y"))
+  year[is.na(year)] <- events$year[d1][is.na(year)]
+  st <- unique(data.frame(g = g, s = events$state))
+  n_states <- tabulate(st$g, length(keys))
+  # Type le plus couteux par episode.
+  gt <- paste(g, events$event_type, sep = "\r")
+  by_type <- rowsum(dmg, gt)
+  bt_g <- as.integer(sub("\r.*", "", rownames(by_type)))
+  bt_type <- sub("^[^\r]*\r", "", rownames(by_type))
+  o <- order(bt_g, -by_type[, 1])
+  top <- o[!duplicated(bt_g[o])]
+  main_type <- character(length(keys))
+  main_type[bt_g[top]] <- bt_type[top]
+  ep <- events$episode_id[d1]
+  out <- data.frame(episode_id = ep, year = year, date = date,
+                    n_events = n_events, n_states = n_states,
+                    main_type = main_type, loss = loss,
+                    stringsAsFactors = FALSE)
   out <- out[out$loss > 0, ]
   out <- out[order(out$date), ]
   rownames(out) <- NULL

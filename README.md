@@ -11,6 +11,8 @@ backtest 2013-2024.
 - 📄 Rapport : https://selyassine.github.io/climatXL/
 - 📊 Application en ligne : https://climatxl.shinyapps.io/climatXL/
 
+[![Application climatXL](man/figures/app.png)](https://climatxl.shinyapps.io/climatXL/)
+
 Ce package teste si la loi des sinistres extrêmes change avec le temps et le
 climat, puis traduit la réponse en prime de traité en excédent de sinistre.
 La conclusion peut aussi être « pas de tendance significative » : elle doit

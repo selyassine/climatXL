@@ -1,11 +1,16 @@
 # climatXL
 
+[![R-CMD-check](https://github.com/selyassine/climatXL/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/selyassine/climatXL/actions/workflows/R-CMD-check.yaml)
+![Licence GPL-3](https://img.shields.io/badge/licence-GPL--3-blue)
+
 > Le climat rend-il la réassurance catastrophe plus chère ?
+
+> **In English.** Does climate make catastrophe reinsurance more expensive? This R package fits stationary and climate-dependent extreme value models (Poisson frequency, GPD severity) to normalised US damage estimates from NOAA event records and prices excess-of-loss layers. On 1996-2024 the answer is "not demonstrably": the 2035 climate loading on the 5 bn xs 10 bn layer is +27 %, with a bootstrap interval from −59 % to +142 %. Report, Shiny app and documentation are in French.
 
 **Réponse sur 1996-2024 : pas de façon démontrable.** La prime pure de la
 tranche 5 Md$ au-delà de 10 Md$ passerait de 2 176 M$ à 2 762 M$ sous un
 réchauffement prolongé jusqu'en 2035 (+27 %), mais l'intervalle bootstrap de
-ce chargement va d'environ −55 % à +150 %, et le modèle stationnaire passe le
+ce chargement va de −59 % à +142 %, et le modèle stationnaire passe le
 backtest 2013-2024.
 
 - 📄 Rapport : https://selyassine.github.io/climatXL/
@@ -139,8 +144,12 @@ annuelle ni reconstitution. Scénario 2035 : tendance de la température
 - Le chargement climatique change de signe selon la tranche : la fréquence
   baisse (tranches basses) pendant que la gravité monte (tranches hautes).
 - **Bootstrap** (années rééchantillonnées) : prime stationnaire 5 xs 10
-  dans [1 186 ; 3 272] M$ ; chargement 2035 de **+27 % dans [−52 % ;
-  +177 %]**. Il n'est donc pas démontré.
+  dans [1 186 ; 3 272] M$ ; chargement 2035 de **+27 % dans [−59 % ;
+  +142 %]** (pipeline et rapport, 300 tirages, graine fixée). Le script
+  exploratoire `analyse/s5c.R` (500 tirages, autre graine) donnait
+  [−52 % ; +177 %] : l'écart entre les deux est du bruit de simulation, et
+  l'intervalle contient zéro dans les deux cas. Le chargement n'est donc
+  pas démontré.
 - **Backtest** (ajusté sur 1996-2012, testé sur 2013-2024) : le modèle
   stationnaire prévoit bien les sinistres (13,2 attendus contre 12 observés
   au-delà de 5 Md$ ; 3,1 contre 3 au-delà de 20 Md$). Le modèle climatique

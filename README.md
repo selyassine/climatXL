@@ -18,6 +18,10 @@ backtest 2013-2024.
 
 [![Application climatXL](man/figures/app.png)](https://climatxl.shinyapps.io/climatXL/)
 
+| Chargement climatique 2035 (bootstrap) | Choix du seuil de la GPD |
+| :-: | :-: |
+| <img src="docs/index_files/figure-html/fig-charg-1.png" alt="Distribution bootstrap du chargement climatique" width="100%"> | <img src="docs/index_files/figure-html/fig-seuil-1.png" alt="Excès moyens et stabilité de xi selon le seuil" width="100%"> |
+
 Ce package teste si la loi des sinistres extrêmes change avec le temps et le
 climat, puis traduit la réponse en prime de traité en excédent de sinistre.
 La conclusion peut aussi être « pas de tendance significative » : elle doit
